@@ -46,7 +46,7 @@ def check_arbitrage(dataframe):
     for colname in dataframe.columns:
         if colname.endswith('odds'):
             odds_columns.append(colname)
-    
+
     best_odds = []
     odds_pair = []
     for index, row in dataframe.iterrows():
@@ -54,14 +54,15 @@ def check_arbitrage(dataframe):
         for colname in odds_columns:
             if int(row[colname]) > int(best_odd):
                 best_odd = row[colname]
+
         odds_pair.append(best_odd)
 
-        if index % 2 == False:
+        if index % 2 == 1:
             best_odds.append(odds_pair)
             odds_pair = []
     
     for pair in best_odds:
-        odd1, odd2 = pair[0], pair[1]
+        odd1, odd2 = int(pair[0]), int(pair[1])
         arbitrage = arbitrage_main(american_decimal(odd1), american_decimal(odd2))
         if isinstance(arbitrage, bool) != True:
             # Arbitrage

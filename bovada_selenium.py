@@ -32,8 +32,9 @@ def bovada_scrape():
 	try:
 		all_live = WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.CLASS_NAME, 'happening-now-bucket')))
 		event_teams = all_live.find_elements(By.CLASS_NAME, 'event-title')
-	except NoSuchElementException or TimeoutException:
-		driver.quit()
+	except TimeoutException:
+		return False
+	except NoSuchElementException:
 		return False
 
 	teams = []
@@ -67,7 +68,6 @@ def bovada_scrape():
 				for betprice in market_types[1].find_elements(By.CLASS_NAME, 'bet-price'):
 					moneyline.append(betprice.text)
 	except StaleElementReferenceException:
-		driver.quit()
 		return False
 
 	driver.quit()

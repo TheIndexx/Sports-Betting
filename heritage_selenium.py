@@ -20,9 +20,8 @@ def heritage_scrape():
     driver = webdriver.Chrome(service=ser, options=options)
     driver.get(web)
     try:
-        panels = WebDriverWait(driver, 10).until(EC.presence_of_all_elements_located((By.CLASS_NAME, 'panel')))
+        panels = WebDriverWait(driver, 20).until(EC.presence_of_all_elements_located((By.CLASS_NAME, 'panel')))
     except TimeoutException:
-        driver.quit()
         return False
 
     teams = []
@@ -30,9 +29,8 @@ def heritage_scrape():
     game_index = []
 
     n = 0
-
+    time.sleep(3)
     for panel in panels:
-        try:
             events = panel.find_elements(By.CLASS_NAME, "event-list__item")
             for event in events:
                 event_continue = True
@@ -41,13 +39,20 @@ def heritage_scrape():
                 both_odds = event.find_elements(By.CLASS_NAME, 'col-xs-12')
                 
                 for odd in both_odds[4:]:
-                    if not odd.find_element(By.CLASS_NAME, 'emphasis').text:
+                    try:
+                        if odd.find_element(By.CLASS_NAME, 'emphasis').text:
+                            moneyline.append(odd.find_element(By.CLASS_NAME, 'emphasis').text)
+                        else:
+                            event_continue = False
+                            break
+                        
+                    except NoSuchElementException:
                         event_continue = False
-                        continue
-                    else:
-                        moneyline.append(odd.find_element(By.CLASS_NAME, 'emphasis').text)
+                        break
+                        
                 if not event_continue:
-                    continue
+                    break
+                
                 ## TEAMS
                 for team_name in event.find_elements(By.CLASS_NAME, 'event-list__item__details__teams__team'):
                     teams.append(team_name.text)
@@ -56,12 +61,8 @@ def heritage_scrape():
                 n += 1
                 ## LEAGUE
                 #league += 2 * [panel.find_element(By.CLASS_NAME, "panel-title").text]
-        except NoSuchElementException:
-            driver.quit()
-            return False
 
     driver.quit()
-    
     data = {
 		"her_index": game_index,
 		"her_teams": teams,

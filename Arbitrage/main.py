@@ -1,5 +1,5 @@
-from bovada_selenium import bov_main
-from heritage_selenium import her_main
+from bov_basketball import bov_main
+from her_basketball import her_main
 from arbitrage import arbitrage_main
 from arbitrage import american_decimal
 from multiprocessing import Pool

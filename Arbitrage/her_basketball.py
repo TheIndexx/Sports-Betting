@@ -11,7 +11,7 @@ import pandas as pd
 
 def heritage_scrape():
     options = Options()
-    options.headless = False
+    options.headless = True
     options.add_experimental_option('excludeSwitches', ['enable-logging'])
     options.add_argument('window-size=1920x1080') #Headless = True
     web = 'https://plive.heritagesports.eu/live/?#!/sport/2'

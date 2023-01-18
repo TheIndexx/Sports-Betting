@@ -20,7 +20,7 @@ Jazz		+200		2
 
 def bovada_scrape():
 	options = Options()
-	options.headless = False
+	options.headless = True
 	options.add_experimental_option('excludeSwitches', ['enable-logging'])
 	options.add_argument('window-size=1920x1080') #Headless = True
 	web = 'https://www.bovada.lv/sports/basketball'
@@ -51,22 +51,30 @@ def bovada_scrape():
 	"""
 	try:
 		for team_group in event_teams:
+			eventcontinue = True
 			event = team_group.find_element(By.XPATH, '..')
 			if len(event.find_elements(By.CLASS_NAME, 'market-type')) > 0:
+				## MONEYLINE ODDS
+				market_types = event.find_elements(By.CLASS_NAME, 'market-type')
+				try:
+					for betprice in market_types[1].find_elements(By.CLASS_NAME, 'bet-price'):
+						moneyline.append(int(betprice.text))
+				except ValueError:
+					eventcontinue = False
+				
+				if not eventcontinue:
+					break
+					
 				## TEAM NAMES
 				for team_name in team_group.find_elements(By.CLASS_NAME, 'name'):
 					teams.append(team_name.text)
 				game_index += 2 * [n]
 				n += 1
 
-				#grouped_events = event.find_element(By.XPATH, '..').find_element(By.XPATH, '..').find_element(By.XPATH, '..').find_element(By.XPATH, '..')
-				#league_name = grouped_events.find_element(By.CLASS_NAME, 'league-header-collapsible__description')
-				#league += 2 * [league_name.text]
+				# grouped_events = event.find_element(By.XPATH, '..').find_element(By.XPATH, '..').find_element(By.XPATH, '..').find_element(By.XPATH, '..')
+				# league_name = grouped_events.find_element(By.CLASS_NAME, 'league-header-collapsible__description')
+				# league += 2 * [league_name.text]
 
-				## MONEYLINE ODDS
-				market_types = event.find_elements(By.CLASS_NAME, 'market-type')
-				for betprice in market_types[1].find_elements(By.CLASS_NAME, 'bet-price'):
-					moneyline.append(betprice.text)
 	except StaleElementReferenceException:
 		return False
 
